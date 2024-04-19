@@ -1,13 +1,24 @@
-1.- Leer datos de un archivo 'txt' y transformarlo en un DataFrame:
-    Utiliza la biblioteca pandas para leer el archivo de texto y cargar los datos en un DataFrame.
-    Si el archivo 'txt' tiene un formato específico, asegúrate de usar los parámetros adecuados al leerlo, como el delimitador, el encabezado, etc.
-    Realiza cualquier limpieza o transformación necesaria en los datos una vez que se hayan cargado en el DataFrame.
+Verificación Automatizada de DNIs
 
-2.- Hacer scraping a una página web y guardar los datos en un DataFrame:
-    Utiliza bibliotecas como selenium requests para realizar el scraping de la página web.
-    Extrae los datos relevantes de la página web y guárdalos en una estructura de datos, como una lista de diccionarios.
-    Convierte la lista de diccionarios en un DataFrame de pandas.
+Descripción:
+Este proyecto consiste en un script en Python que automatiza el proceso de verificación de DNIs en una página web utilizando una base de datos previamente obtenida. La herramienta recorre los DNIs de la base de datos, los ingresa en el formulario de verificación en línea, y compara la información obtenida con la de la base de datos. Se genera un nuevo DataFrame con los DNIs que no coinciden, lo que permite un proceso eficiente de identificación de discrepancias.
 
-3.- Compararemos los DataFrames del cliente y los obtenidos del scraping web para identificar cualquier discrepancia. 
-    Esto puede hacerse mediante métodos de pandas para comparar DataFrames y encontrar diferencias. 
-    Finalmente, imprimiremos por pantalla los datos inconsistentes encontrados durante la comparación para que el cliente pueda revisarlos y tomar decisiones.
+Funcionamiento
+El script utiliza las siguientes tecnologías y herramientas:
+
+Python: Lenguaje de programación utilizado para desarrollar el script.
+Selenium: Librería de automatización de navegadores web, utilizada para interactuar con la página web de verificación de DNIs.
+Pandas: Librería de manipulación y análisis de datos, utilizada para trabajar con la base de datos de DNIs.
+Otros paquetes de Python: Se pueden utilizar otros paquetes según sea necesario para el procesamiento de datos y la manipulación del DataFrame resultante.
+El flujo de trabajo del script es el siguiente:
+
+Lee la base de datos de DNIs previamente obtenida.
+Utiliza Selenium para abrir un navegador web y acceder a la página de verificación de DNIs.
+Ingresa cada DNI en el formulario de verificación en línea.
+Obtiene la información correspondiente al DNI verificado.
+Compara la información obtenida con la de la base de datos.
+Si hay discrepancias, agrega el DNI a un nuevo DataFrame.
+Guarda el nuevo DataFrame en un archivo CSV para su posterior análisis.
+
+Autor
+Este proyecto fue desarrollado por Tu Eliud RM.
