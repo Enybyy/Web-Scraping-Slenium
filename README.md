@@ -2,4 +2,4 @@
 Cada proyecto presenta un enfoque único para abordar desafíos específicos relacionados con la extracción y el procesamiento de datos en línea.
 
 Contenido:
-- VERIFICAR DNI:
+- VERIFICAR DNI
