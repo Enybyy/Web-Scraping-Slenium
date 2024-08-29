@@ -1,3 +1,10 @@
-# Bienvenida al Repositorio de Web Scraping
+# Bienvenido a la Carpeta de Web Scraping
 
-¡Bienvenido al repositorio de Web Scraping! Aquí encontrarás una colección de proyectos diseñados para la extracción automatizada de datos desde diversas páginas web. Estos proyectos están orientados a facilitar la recolección, procesamiento y análisis de información disponible en línea. Cada carpeta dentro de este repositorio ofrece un enfoque único para abordar desafíos específicos de scraping, ayudándote a automatizar tareas repetitivas y acceder a datos valiosos de manera eficiente.
+En esta carpeta encontrarás proyectos dedicados al web scraping, que consiste en la extracción de datos de sitios web para su análisis y procesamiento. Cada proyecto está diseñado para abordar un problema específico mediante la recolección automatizada de datos de la web.
+
+## Contenido
+
+- **Verificación Automatizada de DNIs**:
+  Este proyecto se centra en la automatización del proceso de verificación de DNIs. Utilizando Python, Selenium y Pandas, el script navega por una página web de verificación de DNIs, ingresa los números de una base de datos en el formulario correspondiente, y compara la información obtenida con la base de datos original. Las discrepancias se documentan y se exportan a un archivo CSV para su revisión posterior.
+
+Explora este proyecto para entender cómo el web scraping puede ser utilizado para automatizar y agilizar procesos de verificación de datos en línea.
