@@ -70,4 +70,4 @@ datos_inconsistentes.to_csv('datos_inconsistentes.csv', index=False)
 
 ## Licencia
 
-Este proyecto está licenciado bajo una licencia que prohíbe el uso sin consentimiento y la indemnización correspondiente. Para más detalles, consulta el archivo LICENSE en el repositorio.
+Este proyecto está bajo la licencia **NMS**.
