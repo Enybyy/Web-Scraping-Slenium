@@ -13,7 +13,7 @@ Para ejecutar este proyecto, necesitarás instalar las siguientes bibliotecas de
 
 Puedes instalarlas utilizando el siguiente comando:
 
-```bash
+```python
 pip install pandas selenium requests beautifulsoup4
 ```
 
@@ -25,7 +25,7 @@ Este script lee un archivo de texto con pares de nombre e identificación, limpi
 
 **Código Destacado**:
 
-``` Leer archivo y crear DataFrame
+```python Leer archivo y crear DataFrame
 data_split = open('datos_correo.txt', 'r').read().split('\n')
 df_correo = pd.DataFrame([data_split[i:i+2] for i in range(0, len(data_split), 2)], columns=['NAME', 'ID'])
 df_correo.to_csv('df_dni_name1.csv', index=False)
@@ -37,7 +37,7 @@ Utiliza Selenium para ingresar números de identidad en una página web, extraer
 
 **Código Destacado**:
 
-``` Inicializar el navegador y abrir la página web
+```python Inicializar el navegador y abrir la página web
 driver = webdriver.Chrome()
 driver.get("https://el-dni.com/")
 
@@ -56,7 +56,7 @@ Compara los datos de dos archivos CSV para identificar y mostrar las diferencias
 
 **Código Destacado**:
 
-``` Comparar datos y mostrar inconsistencias
+```python Comparar datos y mostrar inconsistencias
 df_dni_name = pd.read_csv('df_dni_name1.csv')
 df_dni_name_01 = pd.read_csv('df_dni_name2.csv')
 datos_inconsistentes = pd.merge(df_dni_name, df_dni_name_01, how='outer', indicator=True)
