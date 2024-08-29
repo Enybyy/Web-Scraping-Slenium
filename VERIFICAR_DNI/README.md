@@ -1,3 +1,7 @@
+## Licencia
+
+Este proyecto está bajo la licencia **NMS**.
+
 # Verificación de Identidad a través de Web Scraping
 
 Este proyecto tiene como objetivo verificar la identidad de personas utilizando técnicas de web scraping. Incluye scripts para leer datos, extraer información de una página web y comparar resultados para detectar inconsistencias.
@@ -21,7 +25,7 @@ pip install pandas selenium requests beautifulsoup4
 
 ### 1. `01_df_correo.py`
 
-Lee un archivo de texto con pares de nombre e identificación, limpia los datos y los guarda en un archivo CSV.
+Este script lee un archivo de texto con pares de nombre e identificación, limpia los datos y los guarda en un archivo CSV.
 
 **Código Destacado**:
 
@@ -66,7 +70,7 @@ datos_inconsistentes.to_csv('datos_inconsistentes.csv', index=False)
 
 ### 4. `F_verificar_dni_0.1.py`
 
-**Nota**: Este script fue una prueba para acceder a la API y extraer datos de manera más rápida, pero no se completó con éxito. No se incluye código para esta sección.
+Este script fue diseñado para intentar acceder a una API y extraer datos de manera más eficiente. Sin embargo, el enfoque no se completó con éxito y no se incluyó código para esta sección.
 
 ## Licencia
 
