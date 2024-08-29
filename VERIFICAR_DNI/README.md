@@ -1,66 +1,111 @@
-## Código Destacado
+# Verificación Automatizada de DNIs
 
-Aquí se presentan algunas secciones clave del código para entender mejor cómo funciona el proyecto.
+Este proyecto automatiza la verificación de identidades a través de un sistema de web scraping, utilizando Python y diversas bibliotecas. A continuación, se describe en detalle cada componente del sistema y su función.
 
-### 01_df_correo.py
+## Descripción
 
-```python
-# Leer el archivo de texto y dividir los datos en líneas
-with open('../ARCHIVOS_LOCALES/CORREO/datos_correo.txt', 'r', encoding='utf-8') as archivo:
-    data_correo = archivo.read()
-data_split = data_correo.split('\n')
+El sistema consta de cuatro scripts que trabajan en conjunto para verificar identidades mediante números de DNI:
 
-# Crear un DataFrame a partir de los datos
-df_correo = pd.DataFrame(
-    [data_split[i:i+2] for i in range(0, len(data_split), 2)], columns=['NAME', 'ID'])
-```
+1. **Extracción y Formateo de Datos**
+2. **Recuperación de Información desde la Web**
+3. **Comparación de Datos**
+4. **Intento de Verificación Alternativa**
 
-**Explicación**: Este fragmento lee un archivo de texto, lo divide en líneas y organiza los datos en un DataFrame con columnas 'NAME' e 'ID'.
+### 1. Extracción y Formateo de Datos
 
-### 02_xtraer_data_dni.py
+**Script: `01_df_correo.py`**
 
-```python
-# Buscar elementos en la página web utilizando Selenium
-ipt_dni = wait.until(
-    EC.visibility_of_element_located(('xpath', '//input[@type="number" and @name="dni"]')))
-btn_buscar = wait.until(
-    EC.visibility_of_element_located(('xpath', '//button[@class="btn btn-primary mb-3"]')))
-```
+Este script procesa un archivo de texto con datos de nombres e IDs y los convierte en un DataFrame de pandas. Las operaciones clave incluyen:
 
-**Explicación**: Aquí se utilizan `Selenium` y `WebDriverWait` para esperar a que aparezcan los campos de entrada y el botón en la página web antes de interactuar con ellos.
+- **Creación del DataFrame**: Convierte los pares de datos en un DataFrame, aplicando `strip()` para limpiar los datos.
 
-```python
-# Extraer nombres y apellidos de la página
-nombres = driver.find_elements(by='xpath', value='//table[@class="table-bordered table"]/tbody/tr[2]/td[2]')
-apellido = driver.find_elements(by='xpath', value='//table[@class="table-bordered table"]/tbody/tr[3]/td[2]')
-```
+  ```
+  df_correo = pd.DataFrame(
+      [data_split[i:i+2] for i in range(0, len(data_split), 2)], columns=['NAME', 'ID'])
+  df_correo = df_correo.applymap(lambda x: x.strip() if isinstance(x, str) else x)
+  ```
 
-**Explicación**: Este código extrae nombres y apellidos de la página web utilizando `find_elements` con `Selenium`.
+- **Exportación a CSV**: Guarda el DataFrame limpio en un archivo CSV para su posterior uso.
 
-### 03_comparar_data.py
+  ```
+  df_correo.to_csv("C:/Users/EVENTOS/Desktop/PROJECT_PYTHON/ARCHIVOS_LOCALES/CORREO/DATAFRAME/df_dni_name1.csv", index=False, sep=',')
+  ```
 
-```python
-# Comparar los datos y devolver solo los datos que no coinciden
-datos_inconsistentes = pd.merge(
-    df_dni_name, df_dni_name_01, how='outer', indicator=True)
-datos_inconsistentes = datos_inconsistentes[datos_inconsistentes['_merge'] == 'right_only'].drop('_merge', axis=1)
-```
+### 2. Recuperación de Información desde la Web
 
-**Explicación**: Utiliza `pandas` para comparar los DataFrames y encontrar datos que están presentes solo en el archivo más reciente, indicando posibles discrepancias.
+**Script: `02_xtraer_data_dni.py`**
 
-### F_verificar_dni_0.1.py (Prueba)
+Este script utiliza Selenium para automatizar la interacción con la página web de verificación de DNI. Las partes destacadas son:
 
-```python
-# Intentar conectar con la página web y obtener el HTML
-response = requests.get(url, headers=headers)
-```
+- **Interacción con la Web**: Ingresa el DNI en un campo de texto y hace clic en el botón de búsqueda.
 
-**Explicación**: Este fragmento usa `requests` para realizar una solicitud HTTP y obtener el HTML de la página web para análisis.
+  ```
+  ipt_dni.send_keys(dni)
+  btn_buscar.click()
+  ```
 
-```python
-# Analizar el HTML con BeautifulSoup
-soup = BeautifulSoup(html_pagina_web, 'html.parser')
-input_dni = soup.find('input', {'id': 'dni'})
-```
+- **Extracción de Datos**: Recoge los nombres y apellidos desde la página web, asegurando que se manejen adecuadamente los elementos web.
 
-**Explicación**: Usa `BeautifulSoup` para analizar el HTML y buscar elementos específicos en la página web.
+  ```
+  nombres = driver.find_elements(by='xpath', value='//table[@class="table-bordered table"]/tbody/tr[2]/td[2]')
+  apellido = driver.find_elements(by='xpath', value='//table[@class="table-bordered table"]/tbody/tr[3]/td[2]')
+  apellido01 = driver.find_elements(by='xpath', value='//table[@class="table-bordered table"]/tbody/tr[4]/td[2]')
+  
+  apellido_nombres = []
+  for nombre_element in apellido:
+      apellido_nombres.append(nombre_element.text.strip())
+  for apellido_element in apellido01:
+      apellido_nombres.append(apellido_element.text.strip())
+  for apellido01_element in nombres:
+      apellido_nombres.append(apellido01_element.text.strip())
+  
+  df_apellido_nombres = ' '.join(apellido_nombres)
+  lista_fullname.append(df_apellido_nombres)
+  ipt_dni.clear()
+  ```
+
+- **Guardar Resultados**: Exporta los datos recuperados en un nuevo archivo CSV.
+
+  ```
+  df_dni_name2 = pd.DataFrame({'NAME': lista_fullname, 'ID': lista_dni})
+  df_dni_name2.to_csv("C:/Users/EVENTOS/Desktop/PROJECT_PYTHON/ARCHIVOS_LOCALES/CORREO/DATAFRAME/df_dni_name2.csv", index=False)
+  ```
+
+### 3. Comparación de Datos
+
+**Script: `03_comparar_data.py`**
+
+Este script compara los datos originales con los datos recuperados para identificar cualquier discrepancia. Los pasos esenciales son:
+
+- **Comparación de Datos**: Usa una unión externa para encontrar las diferencias entre los dos conjuntos de datos.
+
+  ```
+  datos_inconsistentes = pd.merge(df_dni_name, df_dni_name_01, how='outer', indicator=True)
+  datos_inconsistentes = datos_inconsistentes[datos_inconsistentes['_merge'] == 'right_only'].drop('_merge', axis=1)
+  ```
+
+- **Mostrar Resultados**: Imprime las discrepancias en un formato legible.
+
+  ```
+  print(datos_inconsistentes.to_markdown())
+  ```
+
+### 4. Intento de Verificación Alternativa
+
+**Script: `F_verificar_dni_0.1.py`**
+
+Este script fue una prueba para interactuar con la página web utilizando BeautifulSoup para el análisis del HTML. Aunque no se concretó, sirvió como base para la integración de la verificación alternativa.
+
+- **Conexión a la Página Web**: Intenta conectarse a la página web para analizar el HTML.
+
+  ```
+  headers = {
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+  }
+  response = requests.get(url, headers=headers)
+  ```
+
+## Licencia
+
+Este proyecto está bajo la **Licencia NMS (No Modificar y Compartir)**. Esto significa que el código no puede ser utilizado, modificado ni compartido sin mi consentimiento expreso. Cualquier uso del código sin autorización está prohibido.
