@@ -1,5 +1,3 @@
-¡Bienvenido a nuestra carpeta de proyectos de web scraping con Selenium! Aquí encontrarás una variedad de proyectos en los que hemos utilizado Selenium para extraer datos de páginas web dinámicas y estáticas.
-Cada proyecto presenta un enfoque único para abordar desafíos específicos relacionados con la extracción y el procesamiento de datos en línea.
+# Bienvenida al Repositorio de Web Scraping
 
-Contenido:
-- VERIFICAR DNI
+¡Bienvenido al repositorio de Web Scraping! Aquí encontrarás una colección de proyectos diseñados para la extracción automatizada de datos desde diversas páginas web. Estos proyectos están orientados a facilitar la recolección, procesamiento y análisis de información disponible en línea. Cada carpeta dentro de este repositorio ofrece un enfoque único para abordar desafíos específicos de scraping, ayudándote a automatizar tareas repetitivas y acceder a datos valiosos de manera eficiente.
