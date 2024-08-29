@@ -1,111 +1,107 @@
-# Verificación Automatizada de DNIs
+# Verificación Automatizada de Identidades
 
-Este proyecto automatiza la verificación de identidades a través de un sistema de web scraping, utilizando Python y diversas bibliotecas. A continuación, se describe en detalle cada componente del sistema y su función.
+Este proyecto automatiza la verificación de identidades mediante un sistema de web scraping, utilizando Python y varias bibliotecas. A continuación, se detalla cada componente del sistema y su función.
+
+## Requisitos
+
+Para ejecutar este proyecto, necesitarás tener instalados los siguientes componentes:
+
+- **Python 3.x**: Asegúrate de tener Python 3.x instalado en tu sistema.
+- **Bibliotecas de Python**: Este proyecto utiliza varias bibliotecas de Python. Puedes instalarlas utilizando `pip`. Aquí está el archivo `requirements.txt` que incluye todas las dependencias necesarias:
+
+  ```plaintext
+  pandas
+  selenium
+  requests
+  beautifulsoup4
+  ```
+
+  Para instalar las bibliotecas, ejecuta:
+
+  ```bash
+  pip install -r requirements.txt
+  ```
+
+- **Driver de Selenium**: Necesitas el driver adecuado para el navegador que vas a usar con Selenium (por ejemplo, ChromeDriver para Google Chrome). Descárgalo y colócalo en una ubicación accesible en tu PATH.
+
+- **Archivo de Datos**: Asegúrate de tener el archivo `datos_correo.txt` con los datos necesarios en la ruta especificada en el script `01_df_correo.py`.
 
 ## Descripción
 
-El sistema consta de cuatro scripts que trabajan en conjunto para verificar identidades mediante números de DNI:
-
-1. **Extracción y Formateo de Datos**
-2. **Recuperación de Información desde la Web**
-3. **Comparación de Datos**
-4. **Intento de Verificación Alternativa**
+El sistema consta de cuatro scripts que trabajan en conjunto para verificar identidades mediante números de identidad:
 
 ### 1. Extracción y Formateo de Datos
 
 **Script: `01_df_correo.py`**
 
-Este script procesa un archivo de texto con datos de nombres e IDs y los convierte en un DataFrame de pandas. Las operaciones clave incluyen:
+Este script procesa un archivo de texto con datos de nombres e IDs y los convierte en un DataFrame de pandas. Los datos se leen, se dividen en líneas, se organizan en un DataFrame y se guardan en un archivo CSV. Aquí está un fragmento clave del código que crea el DataFrame:
 
-- **Creación del DataFrame**: Convierte los pares de datos en un DataFrame, aplicando `strip()` para limpiar los datos.
+```python
+df_correo = pd.DataFrame(
+    [data_split[i:i+2] for i in range(0, len(data_split), 2)], columns=['NAME', 'ID'])
+```
 
-  ```
-  df_correo = pd.DataFrame(
-      [data_split[i:i+2] for i in range(0, len(data_split), 2)], columns=['NAME', 'ID'])
-  df_correo = df_correo.applymap(lambda x: x.strip() if isinstance(x, str) else x)
-  ```
-
-- **Exportación a CSV**: Guarda el DataFrame limpio en un archivo CSV para su posterior uso.
-
-  ```
-  df_correo.to_csv("C:/Users/EVENTOS/Desktop/PROJECT_PYTHON/ARCHIVOS_LOCALES/CORREO/DATAFRAME/df_dni_name1.csv", index=False, sep=',')
-  ```
-
-### 2. Recuperación de Información desde la Web
+### 2. Extracción de Datos de la Web
 
 **Script: `02_xtraer_data_dni.py`**
 
-Este script utiliza Selenium para automatizar la interacción con la página web de verificación de DNI. Las partes destacadas son:
+Este script utiliza Selenium para extraer nombres y apellidos asociados a números de identidad desde una página web. Se conecta a la web, ingresa la identidad en un formulario, y recoge la información resultante. Aquí hay un fragmento relevante que busca y llena el campo de identidad y hace clic en el botón de búsqueda:
 
-- **Interacción con la Web**: Ingresa el DNI en un campo de texto y hace clic en el botón de búsqueda.
-
-  ```
-  ipt_dni.send_keys(dni)
-  btn_buscar.click()
-  ```
-
-- **Extracción de Datos**: Recoge los nombres y apellidos desde la página web, asegurando que se manejen adecuadamente los elementos web.
-
-  ```
-  nombres = driver.find_elements(by='xpath', value='//table[@class="table-bordered table"]/tbody/tr[2]/td[2]')
-  apellido = driver.find_elements(by='xpath', value='//table[@class="table-bordered table"]/tbody/tr[3]/td[2]')
-  apellido01 = driver.find_elements(by='xpath', value='//table[@class="table-bordered table"]/tbody/tr[4]/td[2]')
-  
-  apellido_nombres = []
-  for nombre_element in apellido:
-      apellido_nombres.append(nombre_element.text.strip())
-  for apellido_element in apellido01:
-      apellido_nombres.append(apellido_element.text.strip())
-  for apellido01_element in nombres:
-      apellido_nombres.append(apellido01_element.text.strip())
-  
-  df_apellido_nombres = ' '.join(apellido_nombres)
-  lista_fullname.append(df_apellido_nombres)
-  ipt_dni.clear()
-  ```
-
-- **Guardar Resultados**: Exporta los datos recuperados en un nuevo archivo CSV.
-
-  ```
-  df_dni_name2 = pd.DataFrame({'NAME': lista_fullname, 'ID': lista_dni})
-  df_dni_name2.to_csv("C:/Users/EVENTOS/Desktop/PROJECT_PYTHON/ARCHIVOS_LOCALES/CORREO/DATAFRAME/df_dni_name2.csv", index=False)
-  ```
-
+```python
+def eldnicom(dni):
+    wait = WebDriverWait(driver, 5)
+    ipt_dni = wait.until(
+        EC.visibility_of_element_located(('xpath', '//input[@type="number" and @name="dni"]')))
+    btn_buscar = wait.until(
+        EC.visibility_of_element_located(('xpath', '//button[@class="btn btn-primary mb-3"]')))
+    if ipt_dni and btn_buscar:
+        ipt_dni.send_keys(dni)
+        time.sleep(0.1)
+        btn_buscar.click()
+        # Código para extraer los nombres y apellidos
+```
+    
 ### 3. Comparación de Datos
 
 **Script: `03_comparar_data.py`**
 
-Este script compara los datos originales con los datos recuperados para identificar cualquier discrepancia. Los pasos esenciales son:
+Este script compara los datos obtenidos con los datos originales para identificar inconsistencias. Utiliza pandas para realizar una comparación y genera un DataFrame con las discrepancias. Aquí está un fragmento clave que muestra cómo se realiza la comparación:
 
-- **Comparación de Datos**: Usa una unión externa para encontrar las diferencias entre los dos conjuntos de datos.
+```python
+datos_inconsistentes = pd.merge(
+    df_dni_name, df_dni_name_01, how='outer', indicator=True)
+datos_inconsistentes = datos_inconsistentes[datos_inconsistentes['_merge'] == 'right_only'].drop(
+    '_merge', axis=1)
+```
 
-  ```
-  datos_inconsistentes = pd.merge(df_dni_name, df_dni_name_01, how='outer', indicator=True)
-  datos_inconsistentes = datos_inconsistentes[datos_inconsistentes['_merge'] == 'right_only'].drop('_merge', axis=1)
-  ```
-
-- **Mostrar Resultados**: Imprime las discrepancias en un formato legible.
-
-  ```
-  print(datos_inconsistentes.to_markdown())
-  ```
-
-### 4. Intento de Verificación Alternativa
+### 4. Verificación de Acceso a la Web (Prueba)
 
 **Script: `F_verificar_dni_0.1.py`**
 
-Este script fue una prueba para interactuar con la página web utilizando BeautifulSoup para el análisis del HTML. Aunque no se concretó, sirvió como base para la integración de la verificación alternativa.
+Este script es una prueba para conectar y extraer datos de una página web utilizando requests y BeautifulSoup. Aunque no se pudo concretar la automatización completa, el script muestra cómo se podría intentar acceder a los elementos de la página. Aquí un ejemplo de cómo se realiza una solicitud HTTP:
 
-- **Conexión a la Página Web**: Intenta conectarse a la página web para analizar el HTML.
-
-  ```
-  headers = {
-      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
-      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
-  }
-  response = requests.get(url, headers=headers)
-  ```
+```python
+def conectar_a_pagina_web(url):
+    try:
+        headers = {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.7',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36'
+        }
+        response = requests.get(url, headers=headers)
+        if response.status_code == 200:
+            return response.text
+        else:
+            print("Error al conectar con la página web:", response.status_code)
+            return None
+    except requests.exceptions.RequestException as e:
+        print("Error de conexión:", e)
+        return None
+```
 
 ## Licencia
 
-Este proyecto está bajo la **Licencia NMS (No Modificar y Compartir)**. Esto significa que el código no puede ser utilizado, modificado ni compartido sin mi consentimiento expreso. Cualquier uso del código sin autorización está prohibido.
+Este proyecto está bajo la Licencia NMS (No Modificar y Compartir). No puedes usar, modificar, distribuir, ni compartir este código sin mi consentimiento previo. Si necesitas permisos para usar el código, por favor contacta al autor.
+
+---
+
+Para más detalles, consulta la documentación completa en [GitHub](https://github.com/tu_usuario/tu_repositorio).
